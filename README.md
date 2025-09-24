@@ -220,6 +220,14 @@ Para contribuir com o projeto:
 
 Este projeto é propriedade do Hotel Flor de Lima. Todos os direitos reservados.
 
+## 📞 Suporte
+
+Para suporte técnico ou dúvidas sobre o projeto, entre em contato:
+
+- **Email**: contato@hotelflordeLima.com.br
+- **Telefone**: (81) 3456-7890
+- **Endereço**: Rua das Flores, 123 - Centro, Lima - PE
+
 ---
 
 **Hotel Flor de Lima** - Uma experiência única onde tradições eslavas e japonesas se encontram. 🏨✨

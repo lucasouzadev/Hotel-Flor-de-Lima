@@ -1,0 +1,914 @@
+/* Units and Rooms Styles */
+
+/* Hero Section */
+.units-hero {
+    background: linear-gradient(135deg, rgba(139, 69, 19, 0.8), rgba(220, 20, 60, 0.8)),
+                url('../images/rooms/hero-bg.jpg') center/cover;
+    color: white;
+    padding: 120px 0 80px;
+    text-align: center;
+    position: relative;
+}
+
+.units-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.units-hero .hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.units-hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.units-hero p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Search Section */
+.search-section {
+    padding: 40px 0;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.search-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+}
+
+.search-card h2 {
+    font-family: 'Playfair Display', serif;
+    color: #8B4513;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.search-card h2 i {
+    color: #DC143C;
+}
+
+/* Search Form */
+.search-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    align-items: end;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-group label i {
+    color: #DC143C;
+}
+
+.form-group input,
+.form-group select {
+    padding: 12px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #DC143C;
+    box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #8B4513, #DC143C);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #DC143C, #8B4513);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(220, 20, 60, 0.3);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+.btn-outline {
+    background: transparent;
+    color: #8B4513;
+    border: 2px solid #8B4513;
+}
+
+.btn-outline:hover {
+    background: #8B4513;
+    color: white;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+}
+
+.btn-small {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+}
+
+/* Main Content */
+.units-main {
+    padding: 60px 0;
+    min-height: 60vh;
+}
+
+/* Promotions Section */
+.promotions-section {
+    margin-bottom: 60px;
+}
+
+.promotions-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: #8B4513;
+    margin-bottom: 30px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.promotions-section h2 i {
+    color: #DC143C;
+}
+
+.promotions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.promotion-card {
+    background: linear-gradient(135deg, #fff, #f8f9fa);
+    border-radius: 12px;
+    padding: 25px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.promotion-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, #8B4513, #DC143C);
+}
+
+.promotion-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    border-color: #DC143C;
+}
+
+.promotion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.promotion-header h3 {
+    color: #8B4513;
+    margin: 0;
+    font-family: 'Playfair Display', serif;
+    flex: 1;
+}
+
+.discount-badge {
+    background: linear-gradient(135deg, #DC143C, #8B4513);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.promotion-card p {
+    color: #6c757d;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.promotion-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.promotion-details .detail {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.promotion-details .detail i {
+    color: #DC143C;
+    width: 16px;
+    text-align: center;
+}
+
+/* Room Types Section */
+.room-types-section {
+    margin-bottom: 60px;
+}
+
+.room-types-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: #8B4513;
+    margin-bottom: 40px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.room-types-section h2 i {
+    color: #DC143C;
+}
+
+.room-types-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+}
+
+/* Room Type Card */
+.room-type-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.room-type-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.type-image {
+    position: relative;
+    height: 250px;
+    overflow: hidden;
+}
+
+.type-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.room-type-card:hover .type-image img {
+    transform: scale(1.05);
+}
+
+.price-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(220, 20, 60, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+}
+
+.type-content {
+    padding: 25px;
+}
+
+.type-content h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: #8B4513;
+    margin-bottom: 15px;
+}
+
+.type-content > p {
+    color: #6c757d;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+/* Type Details */
+.type-details {
+    margin-bottom: 25px;
+}
+
+.type-details .detail {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    color: #495057;
+    font-size: 0.95rem;
+}
+
+.type-details .detail i {
+    color: #DC143C;
+    width: 16px;
+    text-align: center;
+}
+
+/* Amenities */
+.amenities {
+    margin: 15px 0;
+}
+
+.amenities strong {
+    color: #8B4513;
+    font-size: 0.95rem;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.amenities-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.amenity-tag {
+    background: #f8f9fa;
+    color: #495057;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    border: 1px solid #dee2e6;
+}
+
+.amenity-tag.more {
+    background: #DC143C;
+    color: white;
+    border-color: #DC143C;
+}
+
+/* Search Results Section */
+.search-results-section {
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 2px solid #e9ecef;
+}
+
+.search-results-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    color: #8B4513;
+    margin-bottom: 30px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.search-results-section h2 i {
+    color: #DC143C;
+}
+
+.search-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 25px;
+}
+
+/* Room Card */
+.room-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.room-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.room-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.room-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.room-card:hover .room-image img {
+    transform: scale(1.05);
+}
+
+.room-number {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    background: rgba(139, 69, 19, 0.9);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+}
+
+.room-content {
+    padding: 20px;
+}
+
+.room-content h3 {
+    font-family: 'Playfair Display', serif;
+    color: #8B4513;
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+}
+
+.room-content > p {
+    color: #6c757d;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Room Details */
+.room-details {
+    margin-bottom: 20px;
+}
+
+.room-details .detail {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.room-details .detail i {
+    color: #DC143C;
+    width: 14px;
+    text-align: center;
+}
+
+/* Pricing */
+.pricing {
+    margin-bottom: 20px;
+}
+
+.price-breakdown {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.price-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.price-total {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 8px;
+    border-top: 1px solid #dee2e6;
+    font-weight: 700;
+    color: #8B4513;
+    font-size: 1.1rem;
+}
+
+/* Room Actions */
+.room-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.room-actions .btn {
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+    justify-content: center;
+}
+
+/* User Reservations Section */
+.user-reservations-section {
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 2px solid #e9ecef;
+}
+
+.user-reservations-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    color: #8B4513;
+    margin-bottom: 30px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.user-reservations-section h2 i {
+    color: #DC143C;
+}
+
+/* Reservations List */
+.reservations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.reservation-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    transition: all 0.3s ease;
+}
+
+.reservation-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    border-color: #DC143C;
+}
+
+.reservation-info {
+    flex: 1;
+}
+
+.reservation-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.reservation-header h3 {
+    font-family: 'Playfair Display', serif;
+    color: #8B4513;
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+/* Status Badges */
+.status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-confirmed {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-cancelled {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.status-completed {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* Reservation Details */
+.reservation-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.reservation-details .detail {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    color: #495057;
+}
+
+.reservation-details .detail i {
+    color: #DC143C;
+    width: 14px;
+    text-align: center;
+}
+
+/* Reservation Actions */
+.reservation-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 20px;
+    min-width: 150px;
+}
+
+.reservation-actions .btn {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+}
+
+/* Message Styles */
+.message {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.message-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.message-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.message i {
+    font-size: 1.1rem;
+}
+
+/* Loading Animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #DC143C;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .units-hero h1 {
+        font-size: 2.5rem;
+    }
+    
+    .units-hero p {
+        font-size: 1rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .room-types-grid,
+    .search-results-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .room-type-card,
+    .room-card {
+        margin: 0 10px;
+    }
+    
+    .reservation-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 20px;
+    }
+    
+    .reservation-actions {
+        margin-left: 0;
+        flex-direction: row;
+        min-width: auto;
+    }
+    
+    .reservation-details {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .room-actions {
+        flex-direction: column;
+    }
+    
+    .room-actions .btn {
+        min-width: auto;
+    }
+    
+    .promotions-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .promotion-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .discount-badge {
+        align-self: flex-start;
+    }
+    
+    .room-types-section h2,
+    .search-results-section h2,
+    .user-reservations-section h2,
+    .promotions-section h2 {
+        font-size: 2rem;
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .units-hero {
+        padding: 100px 0 60px;
+    }
+    
+    .units-hero h1 {
+        font-size: 2rem;
+    }
+    
+    .units-main {
+        padding: 40px 0;
+    }
+    
+    .search-card {
+        padding: 20px;
+    }
+    
+    .type-content,
+    .room-content {
+        padding: 20px;
+    }
+    
+    .type-content h3,
+    .room-content h3 {
+        font-size: 1.5rem;
+    }
+    
+    .reservation-actions {
+        flex-direction: column;
+    }
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Focus Styles for Accessibility */
+button:focus,
+input:focus,
+select:focus {
+    outline: 2px solid #DC143C;
+    outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+    .header,
+    .footer,
+    .search-section,
+    .btn,
+    .reservation-actions {
+        display: none !important;
+    }
+    
+    .room-type-card,
+    .room-card,
+    .reservation-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+}
