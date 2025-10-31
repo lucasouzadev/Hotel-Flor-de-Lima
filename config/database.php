@@ -1,11 +1,10 @@
 <?php
-
-// Configurações do banco de dados
-define('DB_HOST', 'tramway.proxy.rlwy.net');
-define('DB_PORT', '47807');
-define('DB_NAME', 'hotel_flor_de_lima');
-define('DB_USER', 'root');
-define('DB_PASS', 'hCErWHFlUrFoCwFxzQfXqEigeLgoHqrD');
+// Configurações do banco de dados PostgreSQL (Render)
+define('DB_HOST', 'dpg-d42jeok9c44c7387pkdg-a');
+define('DB_PORT', '5432');
+define('DB_NAME', 'flor_de_lima_db');
+define('DB_USER', 'flor_de_lima_db_user');
+define('DB_PASS', 'iKRW3hH2d1JYUQmshrQxrKG3v5ecaVO2');
 
 class Database {
     private $connection;
@@ -16,7 +15,9 @@ class Database {
 
     private function connect() {
         try {
-            $dsn = 'mysql:host=' . DB_HOST . ';port=' . DB_PORT . ';dbname=' . DB_NAME . ';charset=utf8mb4';
+            // DSN do PostgreSQL
+            $dsn = 'pgsql:host=' . DB_HOST . ';port=' . DB_PORT . ';dbname=' . DB_NAME . ';';
+            
             $this->connection = new PDO(
                 $dsn,
                 DB_USER,
@@ -51,20 +52,19 @@ class Database {
     }
 
     public function insert($table, $data) {
-        $columns = implode('`, `', array_keys($data));
-        $columns = '`' . $columns . '`';
+        $columns = implode(', ', array_keys($data));
         $placeholders = ':' . implode(', :', array_keys($data));
 
-        $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
+        $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders}) RETURNING id;";
         $stmt = $this->query($sql, $data);
 
-        return $this->connection->lastInsertId();
+        return $stmt->fetchColumn(); // retorna o ID inserido
     }
 
     public function update($table, $data, $where, $whereParams = []) {
         $set = [];
         foreach (array_keys($data) as $key) {
-            $set[] = "`{$key}` = :{$key}";
+            $set[] = "{$key} = :{$key}";
         }
         $set = implode(', ', $set);
 
