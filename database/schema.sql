@@ -1,10 +1,52 @@
 -- Banco de dados para o Hotel Flor de Lima
-CREATE DATABASE IF NOT EXISTS hotel_flor_de_lima;
-USE hotel_flor_de_lima;
+-- Versão convertida para PostgreSQL
+
+-- ============================================================================
+-- CONFIGURAÇÃO INICIAL
+-- ============================================================================
+
+-- Criar banco de dados (execute separadamente se necessário)
+-- CREATE DATABASE hotel_flor_de_lima WITH ENCODING 'UTF8';
+-- \c hotel_flor_de_lima;
+
+-- ============================================================================
+-- TIPOS ENUM
+-- ============================================================================
+
+CREATE TYPE user_status AS ENUM ('active', 'inactive', 'suspended');
+CREATE TYPE room_status AS ENUM ('available', 'occupied', 'maintenance', 'cleaning');
+CREATE TYPE reservation_status AS ENUM ('pending', 'confirmed', 'cancelled', 'completed');
+CREATE TYPE accommodation_status AS ENUM ('checked_in', 'checked_out', 'no_show');
+CREATE TYPE order_status AS ENUM ('pending', 'preparing', 'ready', 'served', 'cancelled');
+CREATE TYPE leisure_status AS ENUM ('available', 'maintenance', 'closed');
+CREATE TYPE leisure_reservation_status AS ENUM ('pending', 'confirmed', 'cancelled');
+CREATE TYPE article_status AS ENUM ('draft', 'published', 'archived');
+CREATE TYPE comment_status AS ENUM ('pending', 'approved', 'rejected');
+CREATE TYPE feedback_category AS ENUM ('accommodation', 'service', 'food', 'facilities', 'general');
+CREATE TYPE cart_item_type AS ENUM ('room', 'drink', 'leisure', 'promotion');
+CREATE TYPE discount_type AS ENUM ('percentage', 'fixed_amount');
+CREATE TYPE promotion_status AS ENUM ('active', 'inactive', 'expired');
+
+-- ============================================================================
+-- FUNÇÕES AUXILIARES
+-- ============================================================================
+
+-- Função para atualizar updated_at automaticamente
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================================================
+-- TABELAS PRINCIPAIS
+-- ============================================================================
 
 -- Tabela de usuários
 CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
@@ -12,247 +54,337 @@ CREATE TABLE users (
     birth_date DATE,
     document VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    status ENUM('active', 'inactive', 'suspended') DEFAULT 'active'
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status user_status DEFAULT 'active'
 );
+
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_status ON users(status);
+
+-- Trigger para updated_at
+CREATE TRIGGER update_users_updated_at
+    BEFORE UPDATE ON users
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
 
 -- Tabela de tipos de quartos
 CREATE TABLE room_types (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     description TEXT,
-    max_occupancy INT NOT NULL,
-    base_price DECIMAL(10,2) NOT NULL,
-    amenities JSON,
-    images JSON,
+    max_occupancy INTEGER NOT NULL,
+    base_price NUMERIC(10,2) NOT NULL,
+    amenities JSONB,
+    images JSONB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX idx_room_types_name ON room_types(name);
 
 -- Tabela de quartos
 CREATE TABLE rooms (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    room_number VARCHAR(10) NOT NULL UNIQUE,
-    room_type_id INT NOT NULL,
-    floor INT NOT NULL,
-    status ENUM('available', 'occupied', 'maintenance', 'cleaning') DEFAULT 'available',
+    id SERIAL PRIMARY KEY,
+    room_number VARCHAR(10) UNIQUE NOT NULL,
+    room_type_id INTEGER NOT NULL,
+    floor INTEGER NOT NULL,
+    status room_status DEFAULT 'available',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (room_type_id) REFERENCES room_types(id)
+    CONSTRAINT fk_room_type FOREIGN KEY (room_type_id) REFERENCES room_types(id) ON DELETE CASCADE
 );
+
+CREATE INDEX idx_rooms_room_number ON rooms(room_number);
+CREATE INDEX idx_rooms_status ON rooms(status);
+CREATE INDEX idx_rooms_room_type ON rooms(room_type_id);
 
 -- Tabela de reservas
 CREATE TABLE reservations (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    room_id INT NOT NULL,
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    room_id INTEGER NOT NULL,
     check_in DATE NOT NULL,
     check_out DATE NOT NULL,
-    guests INT NOT NULL,
-    total_amount DECIMAL(10,2) NOT NULL,
-    status ENUM('pending', 'confirmed', 'cancelled', 'completed') DEFAULT 'pending',
+    guests INTEGER NOT NULL,
+    total_amount NUMERIC(10,2) NOT NULL,
+    status reservation_status DEFAULT 'pending',
     special_requests TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (room_id) REFERENCES rooms(id)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_reservation_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_reservation_room FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
 );
+
+CREATE INDEX idx_reservations_user_id ON reservations(user_id);
+CREATE INDEX idx_reservations_room_id ON reservations(room_id);
+CREATE INDEX idx_reservations_check_in ON reservations(check_in);
+CREATE INDEX idx_reservations_check_out ON reservations(check_out);
+CREATE INDEX idx_reservations_status ON reservations(status);
+
+-- Trigger para updated_at
+CREATE TRIGGER update_reservations_updated_at
+    BEFORE UPDATE ON reservations
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
 
 -- Tabela de hospedagens
 CREATE TABLE accommodations (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    reservation_id INT NOT NULL,
-    check_in_time TIMESTAMP NULL,
-    check_out_time TIMESTAMP NULL,
-    status ENUM('checked_in', 'checked_out', 'no_show') DEFAULT 'checked_in',
+    id SERIAL PRIMARY KEY,
+    reservation_id INTEGER NOT NULL,
+    check_in_time TIMESTAMP,
+    check_out_time TIMESTAMP,
+    status accommodation_status DEFAULT 'checked_in',
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (reservation_id) REFERENCES reservations(id)
+    CONSTRAINT fk_accommodation_reservation FOREIGN KEY (reservation_id) REFERENCES reservations(id) ON DELETE CASCADE
 );
+
+CREATE INDEX idx_accommodations_reservation_id ON accommodations(reservation_id);
+CREATE INDEX idx_accommodations_status ON accommodations(status);
 
 -- Tabela de categorias de drinks
 CREATE TABLE drink_categories (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     description TEXT,
     image VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX idx_drink_categories_name ON drink_categories(name);
 
 -- Tabela de drinks
 CREATE TABLE drinks (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    category_id INT NOT NULL,
+    category_id INTEGER NOT NULL,
     description TEXT,
     ingredients TEXT,
-    price DECIMAL(8,2) NOT NULL,
-    alcohol_content DECIMAL(3,1) DEFAULT 0,
+    price NUMERIC(8,2) NOT NULL,
+    alcohol_content NUMERIC(3,1) DEFAULT 0,
     is_alcoholic BOOLEAN DEFAULT TRUE,
     is_available BOOLEAN DEFAULT TRUE,
     image VARCHAR(255),
-    preparation_time INT DEFAULT 5,
+    preparation_time INTEGER DEFAULT 5,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES drink_categories(id)
+    CONSTRAINT fk_drink_category FOREIGN KEY (category_id) REFERENCES drink_categories(id) ON DELETE CASCADE
 );
+
+CREATE INDEX idx_drinks_category_id ON drinks(category_id);
+CREATE INDEX idx_drinks_is_available ON drinks(is_available);
+CREATE INDEX idx_drinks_is_alcoholic ON drinks(is_alcoholic);
 
 -- Tabela de pedidos do bar
 CREATE TABLE bar_orders (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER,
     table_number VARCHAR(10),
-    status ENUM('pending', 'preparing', 'ready', 'served', 'cancelled') DEFAULT 'pending',
-    total_amount DECIMAL(10,2) NOT NULL,
+    status order_status DEFAULT 'pending',
+    total_amount NUMERIC(10,2) NOT NULL,
     order_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     notes TEXT,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    CONSTRAINT fk_bar_order_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
+
+CREATE INDEX idx_bar_orders_user_id ON bar_orders(user_id);
+CREATE INDEX idx_bar_orders_status ON bar_orders(status);
+CREATE INDEX idx_bar_orders_order_time ON bar_orders(order_time);
 
 -- Tabela de itens do pedido
 CREATE TABLE bar_order_items (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    drink_id INT NOT NULL,
-    quantity INT NOT NULL,
-    unit_price DECIMAL(8,2) NOT NULL,
-    total_price DECIMAL(8,2) NOT NULL,
+    id SERIAL PRIMARY KEY,
+    order_id INTEGER NOT NULL,
+    drink_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
+    unit_price NUMERIC(8,2) NOT NULL,
+    total_price NUMERIC(8,2) NOT NULL,
     special_instructions TEXT,
-    FOREIGN KEY (order_id) REFERENCES bar_orders(id),
-    FOREIGN KEY (drink_id) REFERENCES drinks(id)
+    CONSTRAINT fk_order_item_order FOREIGN KEY (order_id) REFERENCES bar_orders(id) ON DELETE CASCADE,
+    CONSTRAINT fk_order_item_drink FOREIGN KEY (drink_id) REFERENCES drinks(id) ON DELETE CASCADE
 );
+
+CREATE INDEX idx_bar_order_items_order_id ON bar_order_items(order_id);
+CREATE INDEX idx_bar_order_items_drink_id ON bar_order_items(drink_id);
 
 -- Tabela de áreas de lazer
 CREATE TABLE leisure_areas (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT,
-    capacity INT,
-    amenities JSON,
-    operating_hours JSON,
-    images JSON,
-    status ENUM('available', 'maintenance', 'closed') DEFAULT 'available',
+    capacity INTEGER,
+    amenities JSONB,
+    operating_hours JSONB,
+    images JSONB,
+    status leisure_status DEFAULT 'available',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX idx_leisure_areas_status ON leisure_areas(status);
+
 -- Tabela de reservas de áreas de lazer
 CREATE TABLE leisure_reservations (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    area_id INT NOT NULL,
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    area_id INTEGER NOT NULL,
     reservation_date DATE NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
-    guests INT NOT NULL,
-    status ENUM('pending', 'confirmed', 'cancelled') DEFAULT 'pending',
+    guests INTEGER NOT NULL,
+    status leisure_reservation_status DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (area_id) REFERENCES leisure_areas(id)
+    CONSTRAINT fk_leisure_reservation_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_leisure_reservation_area FOREIGN KEY (area_id) REFERENCES leisure_areas(id) ON DELETE CASCADE
 );
+
+CREATE INDEX idx_leisure_reservations_user_id ON leisure_reservations(user_id);
+CREATE INDEX idx_leisure_reservations_area_id ON leisure_reservations(area_id);
+CREATE INDEX idx_leisure_reservations_reservation_date ON leisure_reservations(reservation_date);
+CREATE INDEX idx_leisure_reservations_status ON leisure_reservations(status);
 
 -- Tabela de categorias do jornal
 CREATE TABLE newspaper_categories (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX idx_newspaper_categories_name ON newspaper_categories(name);
+
 -- Tabela de artigos do jornal
 CREATE TABLE newspaper_articles (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     title VARCHAR(200) NOT NULL,
     content TEXT NOT NULL,
-    category_id INT NOT NULL,
-    author_id INT NOT NULL,
+    category_id INTEGER NOT NULL,
+    author_id INTEGER NOT NULL,
     featured_image VARCHAR(255),
-    status ENUM('draft', 'published', 'archived') DEFAULT 'draft',
-    published_at TIMESTAMP NULL DEFAULT NULL,
+    status article_status DEFAULT 'draft',
+    published_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES newspaper_categories(id),
-    FOREIGN KEY (author_id) REFERENCES users(id)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_article_category FOREIGN KEY (category_id) REFERENCES newspaper_categories(id) ON DELETE CASCADE,
+    CONSTRAINT fk_article_author FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+CREATE INDEX idx_newspaper_articles_category_id ON newspaper_articles(category_id);
+CREATE INDEX idx_newspaper_articles_author_id ON newspaper_articles(author_id);
+CREATE INDEX idx_newspaper_articles_status ON newspaper_articles(status);
+CREATE INDEX idx_newspaper_articles_published_at ON newspaper_articles(published_at);
+
+-- Trigger para updated_at
+CREATE TRIGGER update_newspaper_articles_updated_at
+    BEFORE UPDATE ON newspaper_articles
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
 
 -- Tabela de comentários
 CREATE TABLE comments (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    article_id INT,
-    user_id INT NOT NULL,
-    parent_id INT NULL,
+    id SERIAL PRIMARY KEY,
+    article_id INTEGER,
+    user_id INTEGER NOT NULL,
+    parent_id INTEGER,
     content TEXT NOT NULL,
-    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    status comment_status DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (article_id) REFERENCES newspaper_articles(id),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (parent_id) REFERENCES comments(id)
+    CONSTRAINT fk_comment_article FOREIGN KEY (article_id) REFERENCES newspaper_articles(id) ON DELETE CASCADE,
+    CONSTRAINT fk_comment_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_comment_parent FOREIGN KEY (parent_id) REFERENCES comments(id) ON DELETE CASCADE
 );
+
+CREATE INDEX idx_comments_article_id ON comments(article_id);
+CREATE INDEX idx_comments_user_id ON comments(user_id);
+CREATE INDEX idx_comments_parent_id ON comments(parent_id);
+CREATE INDEX idx_comments_status ON comments(status);
 
 -- Tabela de feedbacks
 CREATE TABLE feedbacks (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    reservation_id INT,
-    rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    reservation_id INTEGER,
+    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
     title VARCHAR(200),
     content TEXT NOT NULL,
-    category ENUM('accommodation', 'service', 'food', 'facilities', 'general') DEFAULT 'general',
-    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    category feedback_category DEFAULT 'general',
+    status comment_status DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (reservation_id) REFERENCES reservations(id)
+    CONSTRAINT fk_feedback_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_feedback_reservation FOREIGN KEY (reservation_id) REFERENCES reservations(id) ON DELETE SET NULL
 );
+
+CREATE INDEX idx_feedbacks_user_id ON feedbacks(user_id);
+CREATE INDEX idx_feedbacks_reservation_id ON feedbacks(reservation_id);
+CREATE INDEX idx_feedbacks_rating ON feedbacks(rating);
+CREATE INDEX idx_feedbacks_status ON feedbacks(status);
 
 -- Tabela de carrinho
 CREATE TABLE cart_items (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    item_type ENUM('room', 'drink', 'leisure', 'promotion') NOT NULL,
-    item_id INT NOT NULL,
-    quantity INT DEFAULT 1,
-    price DECIMAL(10,2) NOT NULL,
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    item_type cart_item_type NOT NULL,
+    item_id INTEGER NOT NULL,
+    quantity INTEGER DEFAULT 1,
+    price NUMERIC(10,2) NOT NULL,
     added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expires_at TIMESTAMP NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    expires_at TIMESTAMP,
+    CONSTRAINT fk_cart_item_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+CREATE INDEX idx_cart_items_user_id ON cart_items(user_id);
+CREATE INDEX idx_cart_items_expires_at ON cart_items(expires_at);
 
 -- Tabela de promoções
 CREATE TABLE promotions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     title VARCHAR(200) NOT NULL,
     description TEXT,
-    discount_type ENUM('percentage', 'fixed_amount') NOT NULL,
-    discount_value DECIMAL(10,2) NOT NULL,
-    min_stay INT DEFAULT 1,
+    discount_type discount_type NOT NULL,
+    discount_value NUMERIC(10,2) NOT NULL,
+    min_stay INTEGER DEFAULT 1,
     valid_from DATE NOT NULL,
     valid_until DATE NOT NULL,
-    max_uses INT,
-    current_uses INT DEFAULT 0,
-    status ENUM('active', 'inactive', 'expired') DEFAULT 'active',
+    max_uses INTEGER,
+    current_uses INTEGER DEFAULT 0,
+    status promotion_status DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX idx_promotions_status ON promotions(status);
+CREATE INDEX idx_promotions_valid_from ON promotions(valid_from);
+CREATE INDEX idx_promotions_valid_until ON promotions(valid_until);
+
 -- Tabela de configurações do sistema
 CREATE TABLE system_settings (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     setting_key VARCHAR(100) UNIQUE NOT NULL,
     setting_value TEXT,
     description TEXT,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Inserir dados iniciais
+CREATE INDEX idx_system_settings_setting_key ON system_settings(setting_key);
+
+-- Trigger para updated_at
+CREATE TRIGGER update_system_settings_updated_at
+    BEFORE UPDATE ON system_settings
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================================================
+-- DADOS INICIAIS
+-- ============================================================================
 
 -- Tipos de quartos
 INSERT INTO room_types (name, description, max_occupancy, base_price, amenities, images) VALUES
 ('Standard', 'Quarto confortável com todos os serviços essenciais', 2, 180.00, 
- '["Wi-Fi gratuito", "TV Smart", "Banheiro privativo", "Ar condicionado", "Cofre"]',
- '["room-standard-1.jpg", "room-standard-2.jpg"]'),
+ '["Wi-Fi gratuito", "TV Smart", "Banheiro privativo", "Ar condicionado", "Cofre"]'::jsonb,
+ '["room-standard-1.jpg", "room-standard-2.jpg"]'::jsonb),
  
 ('Deluxe', 'Quarto espaçoso com vista privilegiada e comodidades extras', 2, 320.00,
- '["Wi-Fi gratuito", "TV Smart", "Banheiro privativo", "Ar condicionado", "Cofre", "Mini bar", "Vista privilegiada", "Área de estar"]',
- '["room-deluxe-1.jpg", "room-deluxe-2.jpg"]'),
+ '["Wi-Fi gratuito", "TV Smart", "Banheiro privativo", "Ar condicionado", "Cofre", "Mini bar", "Vista privilegiada", "Área de estar"]'::jsonb,
+ '["room-deluxe-1.jpg", "room-deluxe-2.jpg"]'::jsonb),
  
 ('Suite Presidencial', 'Suíte completa com máximo conforto e sofisticação', 4, 580.00,
- '["Wi-Fi gratuito", "TV Smart", "Banheiro privativo", "Ar condicionado", "Cofre", "Mini bar", "Vista panorâmica", "Salão privativo", "Serviço de concierge"]',
- '["room-suite-1.jpg", "room-suite-2.jpg"]');
+ '["Wi-Fi gratuito", "TV Smart", "Banheiro privativo", "Ar condicionado", "Cofre", "Mini bar", "Vista panorâmica", "Salão privativo", "Serviço de concierge"]'::jsonb,
+ '["room-suite-1.jpg", "room-suite-2.jpg"]'::jsonb);
 
 -- Quartos
 INSERT INTO rooms (room_number, room_type_id, floor) VALUES
@@ -298,24 +430,24 @@ INSERT INTO drinks (name, category_id, description, ingredients, price, alcohol_
 -- Áreas de lazer
 INSERT INTO leisure_areas (name, description, capacity, amenities, operating_hours, images, status) VALUES
 ('Piscina Principal', 'Piscina aquecida com vista panorâmica', 50, 
- '["Cadeiras de praia", "Guarda-sóis", "Bar de piscina", "Vestiários"]',
- '{"open": "06:00", "close": "22:00", "days": "todos"}',
- '["pool-1.jpg", "pool-2.jpg"]', 'available'),
+ '["Cadeiras de praia", "Guarda-sóis", "Bar de piscina", "Vestiários"]'::jsonb,
+ '{"open": "06:00", "close": "22:00", "days": "todos"}'::jsonb,
+ '["pool-1.jpg", "pool-2.jpg"]'::jsonb, 'available'),
  
 ('Spa & Wellness', 'Centro de bem-estar com tratamentos relaxantes', 20,
- '["Massagens", "Sauna", "Banho turco", "Tratamentos faciais"]',
- '{"open": "08:00", "close": "20:00", "days": "todos"}',
- '["spa-1.jpg", "spa-2.jpg"]', 'available'),
+ '["Massagens", "Sauna", "Banho turco", "Tratamentos faciais"]'::jsonb,
+ '{"open": "08:00", "close": "20:00", "days": "todos"}'::jsonb,
+ '["spa-1.jpg", "spa-2.jpg"]'::jsonb, 'available'),
  
 ('Academia', 'Academia moderna com equipamentos de última geração', 30,
- '["Equipamentos cardio", "Musculação", "Personal trainer", "Aulas em grupo"]',
- '{"open": "05:00", "close": "23:00", "days": "todos"}',
- '["gym-1.jpg", "gym-2.jpg"]', 'available'),
+ '["Equipamentos cardio", "Musculação", "Personal trainer", "Aulas em grupo"]'::jsonb,
+ '{"open": "05:00", "close": "23:00", "days": "todos"}'::jsonb,
+ '["gym-1.jpg", "gym-2.jpg"]'::jsonb, 'available'),
  
 ('Jardim Zen', 'Jardim japonês para meditação e relaxamento', 15,
- '["Área de meditação", "Fontes", "Plantas japonesas", "Bancos"]',
- '{"open": "06:00", "close": "20:00", "days": "todos"}',
- '["zen-garden-1.jpg", "zen-garden-2.jpg"]', 'available');
+ '["Área de meditação", "Fontes", "Plantas japonesas", "Bancos"]'::jsonb,
+ '{"open": "06:00", "close": "20:00", "days": "todos"}'::jsonb,
+ '["zen-garden-1.jpg", "zen-garden-2.jpg"]'::jsonb, 'available');
 
 -- Categorias do jornal
 INSERT INTO newspaper_categories (name, description) VALUES
