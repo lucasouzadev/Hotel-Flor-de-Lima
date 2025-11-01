@@ -61,7 +61,7 @@ O Hotel Flor de Lima é mais que um local de hospedagem - é uma experiência co
 
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
 - **Backend**: PHP 7.4+
-- **Banco de Dados**: MySQL
+- **Banco de Dados**: PostgreSQL
 - **Estilização**: CSS Grid, Flexbox, Animações CSS
 - **Icons**: Font Awesome
 - **Fonts**: Google Fonts (Playfair Display, Open Sans)
@@ -108,7 +108,9 @@ FlorDeLima/
 ## 🚀 Instalação
 
 ### Pré-requisitos
-- XAMPP (Apache + MySQL + PHP)
+- PHP 7.4+ com extensão PDO_PGSQL
+- PostgreSQL 12+
+- Servidor Web (Apache/Nginx)
 - Navegador web moderno
 
 ### Passos de Instalação
@@ -120,13 +122,13 @@ FlorDeLima/
    ```
 
 2. **Configure o banco de dados**
-   - Abra o phpMyAdmin (http://localhost/phpmyadmin)
-   - Execute o arquivo `database/schema.sql` para criar o banco e tabelas
+   - Crie um banco de dados PostgreSQL: `CREATE DATABASE flor_de_lima_db;`
+   - Execute o arquivo `database/schema.sql` para criar as tabelas
    - O banco será criado automaticamente com dados de exemplo
 
 3. **Configure as credenciais do banco**
-   - Edite `config/database.php` se necessário
-   - Por padrão usa: host=localhost, user=root, password='', database=hotel_flor_de_lima
+   - Edite `config/database.php` com suas credenciais do PostgreSQL
+   - Configure: host, port, dbname, user, password
 
 4. **Acesse o projeto**
    ```
