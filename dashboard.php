@@ -25,7 +25,7 @@ $userReservations = $db->fetchAll(
 );
 
 $userBarOrders = $db->fetchAll(
-    "SELECT bo.*, GROUP_CONCAT(CONCAT(boi.quantity, 'x ', d.name) SEPARATOR ', ') as items
+    "SELECT bo.*, STRING_AGG(boi.quantity || 'x ' || d.name, ', ') as items
      FROM bar_orders bo
      LEFT JOIN bar_order_items boi ON bo.id = boi.order_id
      LEFT JOIN drinks d ON boi.drink_id = d.id
@@ -557,3 +557,4 @@ if ($_POST && isset($_POST['action']) && $_POST['action'] === 'change_password')
     <script src="assets/js/dashboard.js"></script>
 </body>
 </html>
+
