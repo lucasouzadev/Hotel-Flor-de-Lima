@@ -29,7 +29,7 @@ try {
     $barOrders = $db->fetchAll(
         "SELECT bo.*, 
                 COUNT(boi.id) as items_count,
-                GROUP_CONCAT(d.name SEPARATOR ', ') as drinks_names
+                STRING_AGG(d.name, ', ') as drinks_names
          FROM bar_orders bo
          LEFT JOIN bar_order_items boi ON bo.id = boi.order_id
          LEFT JOIN drinks d ON boi.drink_id = d.id
@@ -79,3 +79,4 @@ try {
     ]);
 }
 ?>
+
