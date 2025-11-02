@@ -53,7 +53,7 @@ try {
         }
         
         // Buscar informações do drink
-        $drink = $db->fetch("SELECT * FROM drinks WHERE id = ? AND is_available = 1", [$drinkId]);
+        $drink = $db->fetch("SELECT * FROM drinks WHERE id = ? AND is_available = true", [$drinkId]);
         
         if (!$drink) {
             echo json_encode(['success' => false, 'message' => "Drink ID $drinkId não encontrado ou indisponível"]);
@@ -116,3 +116,4 @@ try {
     ]);
 }
 ?>
+
