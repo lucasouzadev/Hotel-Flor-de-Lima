@@ -70,7 +70,7 @@ if ($_POST && isset($_POST['action']) && $_POST['action'] === 'search_availabili
             
             $searchResults = $db->fetchAll(
                 "SELECT r.*, rt.name as type_name, rt.description, rt.base_price, rt.max_occupancy, rt.amenities, rt.images,
-                        (? - ?) as nights
+                 EXTRACT(DAY FROM (CAST(? AS DATE) - CAST(? AS DATE)))::INTEGER as nights
                  FROM rooms r 
                  JOIN room_types rt ON r.room_type_id = rt.id 
                  WHERE " . implode(' AND ', $whereConditions) . "
@@ -94,8 +94,8 @@ $userReservations = [];
 if ($auth->isLoggedIn()) {
     $userReservations = $db->fetchAll(
         "SELECT r.*, rt.name as type_name, rt.base_price, ro.room_number,
-                (r.check_out - r.check_in) as nights,
-                (rt.base_price * (r.check_out - r.check_in)) as calculated_total
+                EXTRACT(DAY FROM (r.check_out - r.check_in))::INTEGER as nights,
+                (rt.base_price * EXTRACT(DAY FROM (r.check_out - r.check_in))) as calculated_total
          FROM reservations r
          JOIN rooms ro ON r.room_id = ro.id
          JOIN room_types rt ON ro.room_type_id = rt.id
@@ -110,8 +110,8 @@ if ($auth->isLoggedIn()) {
 $activePromotions = $db->fetchAll(
     "SELECT * FROM promotions 
      WHERE status = 'active' 
-     AND valid_from <= CURDATE() 
-     AND valid_until >= CURDATE() 
+     AND valid_from <= CURRENT_DATE 
+     AND valid_until >= CURRENT_DATE 
      AND (max_uses IS NULL OR current_uses < max_uses)
      ORDER BY discount_value DESC"
 );
@@ -475,3 +475,4 @@ $activePromotions = $db->fetchAll(
 // Include footer
 include 'includes/footer.php';
 ?>
+
