@@ -9,7 +9,7 @@ $messageType = '';
 
 // Buscar categorias e drinks
 $categories = $db->fetchAll("SELECT * FROM drink_categories ORDER BY name");
-$drinks = $db->fetchAll("SELECT d.*, dc.name as category_name FROM drinks d JOIN drink_categories dc ON d.category_id = dc.id WHERE d.is_available = 1 ORDER BY dc.name, d.name");
+$drinks = $db->fetchAll("SELECT d.*, dc.name as category_name FROM drinks d JOIN drink_categories dc ON d.category_id = dc.id WHERE d.is_available = true ORDER BY dc.name, d.name");
 
 // Agrupar drinks por categoria
 $drinksByCategory = [];
@@ -372,3 +372,4 @@ function getCategoryIcon($categoryName) {
     return $icons[$categoryName] ?? 'glass-martini-alt';
 }
 ?>
+
