@@ -26,7 +26,7 @@ if ($_POST && isset($_POST['action']) && $_POST['action'] === 'add_to_cart') {
         $drinkId = (int)$_POST['drink_id'];
         $quantity = (int)($_POST['quantity'] ?? 1);
         
-        $drink = $db->fetch("SELECT * FROM drinks WHERE id = ? AND is_available = 1", [$drinkId]);
+            $drink = $db->fetch("SELECT * FROM drinks WHERE id = ? AND is_available = true", [$drinkId]);
         
         if ($drink) {
             // Adicionar ao carrinho (simulado via JavaScript)
@@ -372,4 +372,5 @@ function getCategoryIcon($categoryName) {
     return $icons[$categoryName] ?? 'glass-martini-alt';
 }
 ?>
+
 
